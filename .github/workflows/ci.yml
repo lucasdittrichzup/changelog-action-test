@@ -27,7 +27,7 @@ jobs:
 
           # echo "Tag: ${{ github.event.inputs.tag }}"
 
-          LR=(git tag | tail -1)
+          LR=(shell git tag | tail -1)
           echo $LR
 
       # - name: Gerar release/tag
