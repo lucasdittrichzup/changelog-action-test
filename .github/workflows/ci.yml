@@ -34,7 +34,7 @@ jobs:
           cat CHANGELOG.md
 
           echo "Get release tag"
-          git tag | tail -1
+          LT=$(git tag | tail -1); echo $LT
 
       # - name: Gerar release/tag
 
