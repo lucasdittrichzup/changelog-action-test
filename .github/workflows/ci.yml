@@ -31,7 +31,8 @@ jobs:
 
           cat CHANGELOG.md
 
-          git tag | tail -1
+          git tag | tail -1 >> latest.txt
+          cat latest.txt
 
       # - name: Gerar release/tag
 
