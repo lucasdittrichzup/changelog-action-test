@@ -21,20 +21,25 @@ jobs:
 
       - name: Gerar o changelog
         run: |
+          echo "Install dependencies"
           gem install github_changelog_generator
+
+          echo "Get the release tag"
+          LT=$(git tag | tail -1); echo $LT
+
+          echo "Generate changelog"
           github_changelog_generator \
           -u lucasdittrichzup \
           -p changelog-action-test
+          -since-tag $LT
           # --token ${{ secrets.GITHUB_TOKEN }}
           # --enhancement-labels feature,Feature \
           # --exclude-labels duplicate,question,invalid,wontfix
 
           # echo "Tag: ${{ github.event.inputs.tag }}"
 
+          echo "Check the generated file"
           cat CHANGELOG.md
-
-          echo "Get release tag"
-          LT=$(git tag | tail -1); echo $LT
 
       # - name: Gerar release/tag
 
