@@ -29,9 +29,9 @@ jobs:
 
           # echo "Tag: ${{ github.event.inputs.tag }}"
 
-          LR=(shell git tag | tail -1); echo $LR
-
           cat CHANGELOG.md
+
+          LR=$(shell git tag | tail -1); echo $LR
 
       # - name: Gerar release/tag
 
