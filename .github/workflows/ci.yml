@@ -31,7 +31,7 @@ jobs:
 
           cat CHANGELOG.md
 
-          LR=$(git tag | tail -1); echo $LR
+          git tag | tail -1
 
       # - name: Gerar release/tag
 
