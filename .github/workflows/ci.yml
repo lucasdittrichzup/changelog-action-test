@@ -20,11 +20,12 @@ jobs:
       - name: Gerar o changelog
         run: |
           gem install github_changelog_generator
-          github_changelog_generator -u lucasdittrichzup \
-          -p changelog-action-test \
-          --token ${{ secrets.GITHUB_TOKEN }} \
-          --enhancement-labels feature,Feature \
-          --exclude-labels duplicate,question,invalid,wontfix
+          github_changelog_generator -h
+          # -u lucasdittrichzup \
+          # -p changelog-action-test \
+          # --token ${{ secrets.GITHUB_TOKEN }} \
+          # --enhancement-labels feature,Feature \
+          # --exclude-labels duplicate,question,invalid,wontfix
 
           # echo "Tag: ${{ github.event.inputs.tag }}"
 
