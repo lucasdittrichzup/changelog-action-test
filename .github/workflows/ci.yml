@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Informe uma tag (e.g.: 2.12.0)'
+        required: true
+  push:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+
+      - name: Gerar o changelog
+        run: |
+          gem install github_changelog_generator
+          github_changelog_generator -u zupit -p ritchie-cli --token ${{ secrets.GITHUB_TOKEN }} --enhancement-labels feature,Feature --exclude-labels duplicate,question,invalid,wontfix
+          # echo "Tag: ${{ github.event.inputs.tag }}"
+
+          git diff
+
+      # - name: Gerar release/tag
+
+      # - name: Abrir a PR com o changelog
+
+      # - name: Atualizar release latest com a descrição das alterações
