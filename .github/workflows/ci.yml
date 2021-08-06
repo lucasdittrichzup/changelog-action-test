@@ -30,7 +30,7 @@ jobs:
           echo "Generate changelog"
           github_changelog_generator \
           -u lucasdittrichzup \
-          -p changelog-action-test
+          -p changelog-action-test \
           --since-tag $LT
           # --token ${{ secrets.GITHUB_TOKEN }}
           # --enhancement-labels feature,Feature \
