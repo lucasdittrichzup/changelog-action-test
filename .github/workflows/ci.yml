@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.0
@@ -31,8 +33,8 @@ jobs:
 
           cat CHANGELOG.md
 
-          git tag | tail -1 >> latest.txt
-          cat latest.txt
+          echo "Get release tag"
+          git tag
 
       # - name: Gerar release/tag
 
