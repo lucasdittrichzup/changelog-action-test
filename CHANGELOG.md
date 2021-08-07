@@ -1,13 +1,13 @@
 # Changelog
 
-## [0.3.0](https://github.com/lucasdittrichzup/changelog-action-test/tree/0.3.0) (2021-08-06)
+## [{tag}](https://github.com/{user/org}/{repo}/tree/{tag}) ({date}[YYYY-MM-DD])
 
-[Full Changelog](https://github.com/lucasdittrichzup/changelog-action-test/compare/0.2.0...0.3.0)
+[Full Changelog](https://github.com/{user/org}/{repo}/compare/{fromTag}...{toTag})
 
-## [0.2.0](https://github.com/lucasdittrichzup/changelog-action-test/tree/0.2.0) (2021-08-06)
+**Closed issues:**
 
-[Full Changelog](https://github.com/lucasdittrichzup/changelog-action-test/compare/0.1.0...0.2.0)
+- {title} [{issueNumber}](https://github.com/{user/org}/{repo}/issues/{issueNumber})
 
-## [0.1.0](https://github.com/lucasdittrichzup/changelog-action-test/tree/0.1.0) (2021-08-06)
+**Merged pull requests:**
 
-[Full Changelog](https://github.com/lucasdittrichzup/changelog-action-test/compare/860617fd6b84d3f96c9375842d21a1a3124ad30b...0.1.0)
+- {title} [{prNumber}](https://github.com/{user/org}/{repo}/pull/{prNumber}) ([{assigneeUser}](https://github.com/{assigneeUser}))
