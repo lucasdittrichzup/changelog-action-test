@@ -2,15 +2,16 @@
 
 ### Scaffold
 
-- [ ] Configurar golang
-- [ ] Adicionar pacote do github api para golang
-- [ ] Adicionar issues no repositório do github
+- [x] Configurar golang
+- [x] Adicionar pacote do github api para golang
+- [x] Adicionar issues no repositório do github
+- [ ] Configurar variáveis de ambiente
 
 ### MVP
 
-- [ ] Definir regra de negócio para geração do changelog
-    - [ ] Issues
-    - [ ] PRs
+- [x] Definir regra de negócio para geração do changelog
+    - [x] Issues
+    - [x] PRs
 - [ ] Preencher template da documentação baseado nos valores da nova release
     - [ ] Issues
     - [ ] PRs
