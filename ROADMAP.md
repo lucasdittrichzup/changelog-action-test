@@ -5,7 +5,7 @@
 - [x] Configurar golang
 - [x] Adicionar pacote do github api para golang
 - [x] Adicionar issues no repositório do github
-- [ ] Configurar variáveis de ambiente
+- [x] Configurar variáveis de ambiente
 
 ### MVP
 
