@@ -10,6 +10,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type pullsData struct {
+	title        string
+	prNumber     int
+	user         string
+	repo         string
+	assigneeUser string
+}
+
 func main() {
 	ctx := context.Background()
 
@@ -48,11 +56,41 @@ func main() {
 	// Coloca todos os títulos das issues elegíveis dentro do slice para uso posterior
 	var allIssuesTitle []string
 	for _, issue := range issues {
-		if issue.ClosedAt.After(lastTag.CreatedAt.Time) {
+		if issue.ClosedAt.After(lastTag.CreatedAt.Time) && issue.PullRequestLinks == nil {
 			allIssuesTitle = append(allIssuesTitle, *issue.Title)
-			fmt.Println(allIssuesTitle)
 		}
 	}
+
+	fmt.Println(allIssuesTitle)
+
+	// Seleciona todas as pr fechadas
+	prs, _, err := client.PullRequests.List(
+		ctx,
+		owner,
+		repo,
+		&github.PullRequestListOptions{State: "closed"},
+	)
+	if err != nil {
+		log.Fatalf("error listing prs: %v", err)
+	}
+
+	// Filtra as prs mergeadas após a data de criação da tag
+	// TODO: abrir issue no repo go-github, pois retorna erro ao usar o campo name da struct de user
+	var mergedPulls []pullsData
+	for _, pr := range prs {
+		if pr.MergedAt.After(lastTag.CreatedAt.Time) {
+			mergedPull := pullsData{
+				title:        *pr.Title,
+				prNumber:     *pr.Number,
+				user:         *pr.Base.User.Login,
+				repo:         *pr.Base.Repo.Name,
+				assigneeUser: *pr.Assignee.Login,
+			}
+			mergedPulls = append(mergedPulls, mergedPull)
+		}
+	}
+
+	fmt.Println(mergedPulls)
 }
 
 func getConfig(key string) string {
