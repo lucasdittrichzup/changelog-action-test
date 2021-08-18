@@ -24,9 +24,9 @@ type issuesData struct {
 type pullsData struct {
 	title        string
 	prNumber     int
-	user         string
-	repo         string
+	link         string
 	assigneeUser string
+	assigneeLink string
 }
 
 func main() {
@@ -86,14 +86,14 @@ func main() {
 	var mergedPulls []pullsData
 	for _, pr := range prs {
 		if pr.MergedAt.After(previousRelease.publishedAt.Time) && pr.MergedAt.Before(nextRelease.publishedAt.Time) {
-			mergedPull := pullsData{
+			filterPull := pullsData{
 				title:        *pr.Title,
 				prNumber:     *pr.Number,
-				user:         *pr.Base.User.Login,
-				repo:         *pr.Base.Repo.Name,
-				assigneeUser: *pr.Assignee.Login,
+				link:         *pr.HTMLURL,
+				assigneeUser: *pr.User.Login,
+				assigneeLink: *pr.User.HTMLURL,
 			}
-			mergedPulls = append(mergedPulls, mergedPull)
+			mergedPulls = append(mergedPulls, filterPull)
 		}
 	}
 }
