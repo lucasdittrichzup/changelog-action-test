@@ -2,7 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/google/go-github/github"
 	"github.com/spf13/viper"
@@ -29,12 +34,20 @@ type pullsData struct {
 	assigneeLink string
 }
 
+var (
+	title         = "\n## [%s](%s) (%s)"
+	fullChangelog = "\n\n[Full Changelog](https://github.com/%v/%v/compare/%v...%v)"
+	closedIssues  = "\n\n**Closed issues:**\n"
+	mergedPR      = "\n\n**Merged pull requests:**\n"
+	issueTemplate = "\n- %s [#%v](%s)"
+	prTemplate    = "\n- %s [#%v](%s) ([%s](%s))"
+	token         = getConfig("TOKEN")
+	owner         = getConfig("OWNER")
+	repo          = getConfig("REPO")
+)
+
 func main() {
 	ctx := context.Background()
-
-	token := getConfig("TOKEN")
-	owner := getConfig("OWNER")
-	repo := getConfig("REPO")
 
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -96,6 +109,45 @@ func main() {
 			mergedPulls = append(mergedPulls, filterPull)
 		}
 	}
+
+	generateChangelog(previousRelease, nextRelease, allIssuesTitle, mergedPulls)
+
+	fmt.Println("Finish!")
+}
+
+func generateChangelog(previousRelease, nextRelease tagData, issues []issuesData, prs []pullsData) {
+	// Leitura do arquivo
+	file := filepath.Join("CHANGELOG.md")
+	fileRead, _ := ioutil.ReadFile(file)
+	lines := strings.Split(string(fileRead), "\n")
+
+	// Lógica: https: //stackoverflow.com/questions/46128016/insert-a-value-in-a-slice-at-a-given-index
+	lines = append(lines[:1+1], lines[1:]...)
+	formatTitle := fmt.Sprintf(title, nextRelease.tagName, nextRelease.link, nextRelease.publishedAt.Format("2006-01-04"))
+	formatFullChangelog := fmt.Sprintf(fullChangelog, owner, repo, previousRelease.tagName, nextRelease.tagName) // TODO: Ajustar para o caso da zup (ou quando o owner ou organização for diferente...)
+	lines[1] = formatTitle + formatFullChangelog
+
+	// Valida e formata a parte das issues
+	if len(issues) > 0 {
+		lines[1] = lines[1] + closedIssues
+
+		for _, issue := range issues {
+			lines[1] = lines[1] + fmt.Sprintf(issueTemplate, issue.title, issue.issueNumber, issue.link)
+		}
+	}
+
+	// Valida e formata a parte das prs
+	if len(prs) > 0 {
+		lines[1] = lines[1] + mergedPR
+
+		for _, pr := range prs {
+			lines[1] = lines[1] + fmt.Sprintf(prTemplate, pr.title, pr.prNumber, pr.link, pr.assigneeUser, pr.assigneeLink)
+		}
+	}
+
+	// Escreve no arquivo o changelog gerado
+	newFile := strings.Join(lines, "\n")
+	ioutil.WriteFile(file, []byte(newFile), os.ModePerm)
 }
 
 func getNextRelease() tagData {
