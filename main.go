@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/google/go-github/github"
@@ -14,6 +13,12 @@ type tagData struct {
 	tagName     string
 	link        string
 	publishedAt *github.Timestamp
+}
+
+type issuesData struct {
+	title       string
+	issueNumber int
+	link        string
 }
 
 type pullsData struct {
@@ -53,14 +58,17 @@ func main() {
 	}
 
 	// Coloca todos os títulos das issues elegíveis dentro do slice para uso posterior
-	var allIssuesTitle []string
+	var allIssuesTitle []issuesData
 	for _, issue := range issues {
 		if issue.ClosedAt.After(previousRelease.publishedAt.Time) && issue.PullRequestLinks == nil && issue.ClosedAt.Before(nextRelease.publishedAt.Time) {
-			allIssuesTitle = append(allIssuesTitle, *issue.Title)
+			filterIssue := issuesData{
+				title:       *issue.Title,
+				issueNumber: *issue.Number,
+				link:        *issue.HTMLURL,
+			}
+			allIssuesTitle = append(allIssuesTitle, filterIssue)
 		}
 	}
-
-	fmt.Println(allIssuesTitle)
 
 	// Seleciona todas as pr fechadas
 	prs, _, err := client.PullRequests.List(
@@ -88,8 +96,6 @@ func main() {
 			mergedPulls = append(mergedPulls, mergedPull)
 		}
 	}
-
-	fmt.Println(mergedPulls)
 }
 
 func getNextRelease() tagData {
