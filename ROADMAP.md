@@ -12,9 +12,12 @@
 - [x] Definir regra de negócio para geração do changelog
     - [x] Issues
     - [x] PRs
-- [ ] Preencher template da documentação baseado nos valores da nova release
-    - [ ] Issues
-    - [ ] PRs
+- [x] Preencher template da documentação baseado nos valores da nova release
+    - [x] Issues
+    - [x] PRs
+- [ ] Validações
+    - [ ] Caso o arquivo não exista
+    - [ ] Se não filtrar os dados corretamente, o changelog não deve ser gerado
 - [ ] Acrescentar CHANGELOG da nova release no início do arquivo existente
 - [ ] Transformar o script final em um action
 
@@ -22,17 +25,19 @@
 
 - [ ] Traduzir arquivos para inglês
 - [ ] Gerar log do processamento dos passos
+- [ ] Gerar changelog retroativo
+- [ ] Escolher nome da action
 
 ### Business rule
 
-- [ ] Para issue:
-    - [ ] A data de início deve ser a data (tag)
-    - [ ] A data fim deve ser a data (tag)
-    - [ ] Deve retornar apenas issues fechadas
-    - [ ] O valor que deve retornar por issue deve ser o título
+- [x] Para issue:
+    - [x] A data de início deve ser a data de publicação da release anterior
+    - [x] A data fim deve ser a data de publicação da próxima release
+    - [x] Deve retornar apenas issues fechadas
+    - [x] O valor que deve retornar por issue deve ser o título
 
-- [ ] Para PR:
-    - [ ] A data de início deve ser a data (tag)
-    - [ ] A data fim deve ser a data (tag)
-    - [ ] Deve retornar apenas PR mergeado
-    - [ ] O valor que deve retornar por PR deve ser, inicialmente, o título e, após, o valor do changelog retornado no body
+- [x] Para PR:
+    - [x] A data de início deve ser a data de publicação da release anterior
+    - [x] A data fim deve ser a data de publicação da próxima release
+    - [x] Deve retornar apenas PR mergeado
+    - [x] O valor que deve retornar por PR deve ser, inicialmente, o título e, após, o valor do changelog retornado no body
