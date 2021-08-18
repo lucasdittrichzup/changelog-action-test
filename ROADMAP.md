@@ -26,7 +26,11 @@
 - [ ] Traduzir arquivos para inglês
 - [ ] Gerar log do processamento dos passos
 - [ ] Gerar changelog retroativo
+- [ ] Se não houver responsável pela PR, adicionar o criador no template do changelog
+- [ ] Refatorações
+    - [ ] Retornar erros corretamente
 - [ ] Escolher nome da action
+- [ ] Adicionar testes unitários
 
 ### Business rule
 

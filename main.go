@@ -34,83 +34,32 @@ type pullsData struct {
 	assigneeLink string
 }
 
+const (
+	closedIssues = "\n\n**Closed issues:**\n"
+	mergedPR     = "\n\n**Merged pull requests:**\n"
+)
+
 var (
 	title         = "\n## [%s](%s) (%s)"
 	fullChangelog = "\n\n[Full Changelog](https://github.com/%v/%v/compare/%v...%v)"
-	closedIssues  = "\n\n**Closed issues:**\n"
-	mergedPR      = "\n\n**Merged pull requests:**\n"
 	issueTemplate = "\n- %s [#%v](%s)"
 	prTemplate    = "\n- %s [#%v](%s) ([%s](%s))"
 	token         = getConfig("TOKEN")
 	owner         = getConfig("OWNER")
 	repo          = getConfig("REPO")
+	ctx           = context.Background()
 )
 
 func main() {
-	ctx := context.Background()
+	client := setupClient()
 
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+	previousRelease := getPreviousRelease(client)
+	nextRelease := getNextRelease(client)
 
-	client := github.NewClient(tc)
+	closedIssues := filterIssues(client, previousRelease, nextRelease)
+	mergedPulls := filterPulls(client, previousRelease, nextRelease)
 
-	previousRelease := getPreviousRelease()
-	nextRelease := getNextRelease()
-
-	// Seleciona todas as issues fechadas depois da data de criação da tag
-	issues, _, err := client.Issues.ListByRepo(
-		context.Background(),
-		owner,
-		repo,
-		&github.IssueListByRepoOptions{State: "closed", Since: previousRelease.publishedAt.Time},
-	)
-	if err != nil {
-		log.Fatalf("error listing issues: %v", err)
-	}
-
-	// Coloca todos os títulos das issues elegíveis dentro do slice para uso posterior
-	var allIssuesTitle []issuesData
-	for _, issue := range issues {
-		if issue.ClosedAt.After(previousRelease.publishedAt.Time) && issue.PullRequestLinks == nil && issue.ClosedAt.Before(nextRelease.publishedAt.Time) {
-			filterIssue := issuesData{
-				title:       *issue.Title,
-				issueNumber: *issue.Number,
-				link:        *issue.HTMLURL,
-			}
-			allIssuesTitle = append(allIssuesTitle, filterIssue)
-		}
-	}
-
-	// Seleciona todas as pr fechadas
-	prs, _, err := client.PullRequests.List(
-		ctx,
-		owner,
-		repo,
-		&github.PullRequestListOptions{State: "closed"},
-	)
-	if err != nil {
-		log.Fatalf("error listing prs: %v", err)
-	}
-
-	// Filtra as prs mergeadas após a data de criação da tag
-	// TODO: abrir issue no repo go-github, pois retorna erro ao usar o campo name da struct de user
-	var mergedPulls []pullsData
-	for _, pr := range prs {
-		if pr.MergedAt.After(previousRelease.publishedAt.Time) && pr.MergedAt.Before(nextRelease.publishedAt.Time) {
-			filterPull := pullsData{
-				title:        *pr.Title,
-				prNumber:     *pr.Number,
-				link:         *pr.HTMLURL,
-				assigneeUser: *pr.User.Login,
-				assigneeLink: *pr.User.HTMLURL,
-			}
-			mergedPulls = append(mergedPulls, filterPull)
-		}
-	}
-
-	generateChangelog(previousRelease, nextRelease, allIssuesTitle, mergedPulls)
+	generateChangelog(previousRelease, nextRelease, closedIssues, mergedPulls)
 
 	fmt.Println("Finish!")
 }
@@ -150,20 +99,66 @@ func generateChangelog(previousRelease, nextRelease tagData, issues []issuesData
 	ioutil.WriteFile(file, []byte(newFile), os.ModePerm)
 }
 
-func getNextRelease() tagData {
-	ctx := context.Background()
-
-	token := getConfig("TOKEN")
-	owner := getConfig("OWNER")
-	repo := getConfig("REPO")
-
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
+func filterIssues(client *github.Client, pr, nr tagData) []issuesData {
+	// Seleciona todas as issues fechadas depois da data de criação da tag
+	issues, _, err := client.Issues.ListByRepo(
+		context.Background(),
+		owner,
+		repo,
+		&github.IssueListByRepoOptions{State: "closed", Since: pr.publishedAt.Time},
 	)
-	tc := oauth2.NewClient(ctx, ts)
+	if err != nil {
+		log.Fatalf("error listing issues: %v", err)
+	}
 
-	client := github.NewClient(tc)
+	// Coloca todos os títulos das issues elegíveis dentro do slice para uso posterior
+	var filteredIssues []issuesData
+	for _, issue := range issues {
+		if issue.ClosedAt.After(pr.publishedAt.Time) && issue.PullRequestLinks == nil && issue.ClosedAt.Before(nr.publishedAt.Time) {
+			filterIssue := issuesData{
+				title:       *issue.Title,
+				issueNumber: *issue.Number,
+				link:        *issue.HTMLURL,
+			}
+			filteredIssues = append(filteredIssues, filterIssue)
+		}
+	}
 
+	return filteredIssues
+}
+
+func filterPulls(client *github.Client, psr, nr tagData) []pullsData {
+	// Seleciona todas as pr fechadas
+	prs, _, err := client.PullRequests.List(
+		ctx,
+		owner,
+		repo,
+		&github.PullRequestListOptions{State: "closed"},
+	)
+	if err != nil {
+		log.Fatalf("error listing prs: %v", err)
+	}
+
+	// Filtra as prs mergeadas após a data de criação da tag
+	// TODO: abrir issue no repo go-github, pois retorna erro ao usar o campo name da struct de user
+	var mergedPulls []pullsData
+	for _, pr := range prs {
+		if pr.MergedAt.After(psr.publishedAt.Time) && pr.MergedAt.Before(nr.publishedAt.Time) {
+			filterPull := pullsData{
+				title:        *pr.Title,
+				prNumber:     *pr.Number,
+				link:         *pr.HTMLURL,
+				assigneeUser: *pr.User.Login,
+				assigneeLink: *pr.User.HTMLURL,
+			}
+			mergedPulls = append(mergedPulls, filterPull)
+		}
+	}
+
+	return mergedPulls
+}
+
+func getNextRelease(client *github.Client) tagData {
 	// Pega a última tag do repositório
 	lastTag, _, err := client.Repositories.GetLatestRelease(
 		context.Background(),
@@ -183,20 +178,7 @@ func getNextRelease() tagData {
 	return nrData
 }
 
-func getPreviousRelease() tagData {
-	ctx := context.Background()
-
-	token := getConfig("TOKEN")
-	owner := getConfig("OWNER")
-	repo := getConfig("REPO")
-
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	client := github.NewClient(tc)
-
+func getPreviousRelease(client *github.Client) tagData {
 	// Pega a última tag do repositório
 	tags, _, err := client.Repositories.ListReleases(
 		context.Background(),
@@ -205,7 +187,7 @@ func getPreviousRelease() tagData {
 		&github.ListOptions{},
 	)
 	if err != nil {
-		log.Fatalf("error getting the last tag: %v", err)
+		log.Fatalf("error getting the previous tag: %v", err)
 	}
 
 	previousRelease := tags[1]
@@ -233,4 +215,15 @@ func getConfig(key string) string {
 	}
 
 	return value
+}
+
+func setupClient() *github.Client {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
+
+	return client
 }
