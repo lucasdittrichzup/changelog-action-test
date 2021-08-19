@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
+	ga "github.com/sethvargo/go-githubactions"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 )
@@ -44,14 +45,20 @@ var (
 	fullChangelog = "\n\n[Full Changelog](https://github.com/%v/%v/compare/%v...%v)"
 	issueTemplate = "\n- %s [#%v](%s)"
 	prTemplate    = "\n- %s [#%v](%s) ([%s](%s))"
-	token         = getConfig("TOKEN")
-	owner         = getConfig("OWNER")
-	repo          = getConfig("REPO")
+	token         = ga.GetInput("token")
+	owner         = ga.GetInput("owner")
+	repo          = ga.GetInput("repo")
 	ctx           = context.Background()
 )
 
 func main() {
 	client := setupClient()
+
+	if token == "" || repo == "" {
+		ga.Fatalf("missing required inputs")
+	}
+
+	ga.AddMask(token)
 
 	previousRelease := getPreviousRelease(client)
 	nextRelease := getNextRelease(client)

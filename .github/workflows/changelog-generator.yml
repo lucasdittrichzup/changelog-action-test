@@ -1,0 +1,18 @@
+name: Changelog generator
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Generator
+      uses: lucasdittrichzup/changelog-generator@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        owner: lucasdittrichzup
+        repo: changelog-action-test
+
+    - name: Check changelog file
+      run: cat CHANGELOG.md
