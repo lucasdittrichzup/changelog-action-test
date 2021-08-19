@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Generator
-      uses: lucasdittrichzup/changelog-generator@main
+      uses: lucasdittrichzup/changelog-action-test@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         owner: lucasdittrichzup
