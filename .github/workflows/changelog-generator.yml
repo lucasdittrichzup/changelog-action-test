@@ -13,17 +13,30 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Push tag
-      uses: anothrNick/github-tag-action@1.26.0
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
       env:
-        CUSTOM_TAG: ${{ github.event.inputs.new_tag }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: false
-
-    - name: Release
-      uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ github.event.inputs.new_tag }}
+        release_name: Release ${{ github.event.inputs.new_tag }}
+        body: |
+          Changes in this Release
+
+
+    # - name: Push tag
+    #   uses: anothrNick/github-tag-action@1.26.0
+    #   env:
+    #     CUSTOM_TAG: ${{ github.event.inputs.new_tag }}
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     WITH_V: false
+
+    # - name: Release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     body: ''
+    #     tag_name: ${{ github.event.inputs.new_tag }}
 
     # - name: Changelog generator
     #   uses: dittrichlucas/changelog-generator@main
