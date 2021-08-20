@@ -11,7 +11,7 @@ jobs:
       uses: dittrichlucas/changelog-generator@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        repo: ${{ secrets.GITHUB_REPO }}
+        repo: ${{ secrets.GITHUB_REPOSITORY }}
 
     - name: Check changelog file
       run: cat CHANGELOG.md
