@@ -41,7 +41,7 @@ jobs:
         signoff: true
         branch: release-$TAG_NAME
         delete-branch: true
-        title: '[ci] Release '
+        title: 'ci: generate the changelog file for the $TAG_NAME release'
         body: |
           Update the `CHANGELOG.md` file with the deliveries of the $TAG_NAME release
         assignees: lucasdittrichzup
