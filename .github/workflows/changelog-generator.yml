@@ -9,14 +9,14 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Push tag
-      uses: mathieudutour/github-tag-action@v5.6
-      with:
-        custom_tag: '0.7.0'
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      uses: anothrNick/github-tag-action@1.26.0
+      env:
+        CUSTOM_TAG: '0.7.0'
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: false
 
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
 
     # - name: Changelog generator
     #   uses: dittrichlucas/changelog-generator@main
