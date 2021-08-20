@@ -8,11 +8,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Generator
-      uses: lucasdittrichzup/changelog-action-test@main
+      uses: dittrichlucas/changelog-generator@refactor/code-sanitization
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        owner: lucasdittrichzup
-        repo: changelog-action-test
+        repo: ${{ secrets.GITHUB_REPO }}
 
     - name: Check changelog file
       run: cat CHANGELOG.md
