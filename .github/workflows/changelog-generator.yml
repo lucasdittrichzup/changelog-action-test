@@ -4,14 +4,14 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
+
     - name: Generator
       uses: dittrichlucas/changelog-generator@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        repo: ${{ secrets.GITHUB_REPOSITORY }}
+        repo: ${{ github.repository }}
 
     - name: Check changelog file
       run: cat CHANGELOG.md

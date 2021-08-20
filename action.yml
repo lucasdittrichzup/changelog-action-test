@@ -4,9 +4,6 @@ inputs:
   token:
     description: 'Token for operations'
     required: true
-  owner:
-    description: 'Repository owner'
-    required: true
   repo:
     description: 'Repository name'
     required: true
