@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Generator
-      uses: dittrichlucas/changelog-generator@refactor/code-sanitization
+      uses: dittrichlucas/changelog-generator@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         repo: ${{ secrets.GITHUB_REPO }}
