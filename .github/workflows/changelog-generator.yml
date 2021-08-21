@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      TAG_NAME: ${{ github.event.inputs.new_tag }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -16,38 +19,34 @@ jobs:
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.event.inputs.new_tag }}
-        release_name: Release ${{ github.event.inputs.new_tag }}
+        tag_name: ${{ env.TAG_NAME }}
+        release_name: Release ${{ env.TAG_NAME }}
         body: |
           Changes in this release
 
     - name: Changelog generator
       uses: dittrichlucas/changelog-generator@main
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ env.GITHUB_TOKEN }}
         repo: ${{ github.repository }}
 
     - name: Create Pull Request
       id: cpr
       uses: peter-evans/create-pull-request@v3
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ env.GITHUB_TOKEN }}
         commit-message: "ci: update the changelog file with new release deliveries"
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         signoff: true
-        branch: release-${{ TAG_NAME }}
+        branch: release-${{ env.TAG_NAME }}
         delete-branch: true
-        title: "ci: generate the changelog file for the ${{ github.event.inputs.new_tag }} release"
+        title: "ci: generate the changelog file for the ${{ env.TAG_NAME }} release"
         body: |
-          "Update the `CHANGELOG.md` file with the deliveries of the ${{ github.event.inputs.new_tag }} release"
+          "Update the `CHANGELOG.md` file with the deliveries of the ${{ env.TAG_NAME }} release"
         assignees: lucasdittrichzup
         draft: false
-      env:
-        TAG_NAME: ${{ github.event.inputs.new_tag }}
 
     - name: Check outputs
       run: |
