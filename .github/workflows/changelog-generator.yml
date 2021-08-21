@@ -39,11 +39,11 @@ jobs:
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         signoff: true
-        branch: release-${TAG_NAME}
+        branch: release-${{ TAG_NAME }}
         delete-branch: true
         title: "ci: generate the changelog file for the ${{ github.event.inputs.new_tag }} release"
         body: |
-          "Update the `CHANGELOG.md` file with the deliveries of the $TAG_NAME release"
+          "Update the `CHANGELOG.md` file with the deliveries of the ${{ github.event.inputs.new_tag }} release"
         assignees: lucasdittrichzup
         draft: false
       env:
